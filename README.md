@@ -3,7 +3,8 @@ This is an edit of the ThreeBodyBot [https://github.com/kirklong/ThreeBodyBot](h
 
 <img src="heatmap/rheatmap-fixedlabel.png" width="315" height="280">
 
-This was achieved with some hacky edits to [`threeBodyProb.jl`](threeBodyProb.jl) to make it loop through initial conditions and record time to collision, and an R script to visualize it [`heatmap/create_heatmap.R`](heatmap/create_heatmap.R). For the initial conditions, I just ran the original script to find an interesting starting point, then chose a range of starting x and y values for mass 1.
+
+This was achieved with some hacky edits to [`threeBodyProb.jl`](threeBodyProb.jl) to make it loop through initial conditions and record time to collision, and an R script to visualize it [`heatmap/create_heatmap.R`](heatmap/create_heatmap.R). For the initial conditions, I just ran the original script to find an interesting starting point, then chose a range of starting x and y values for mass 1. Data file here: [`heatmap/separatedData.csv`](heatmap/separatedData.csv)
 
 # Original Readme below:
 
