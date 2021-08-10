@@ -1,3 +1,12 @@
+# Forked version of ThreeBodyBot for heatmap of different initial conditions
+This is an edit of the ThreeBodyBot [https://github.com/kirklong/ThreeBodyBot](https://github.com/kirklong/ThreeBodyBot) which was made to see the effect of modifying the initial conditions on how long it took for a collision to occur (if one did):
+
+<img src="heatmap/rheatmap-fixedlabel.png" width="315" height="280">
+
+This was achieved with some hacky edits to [`threeBodyProb.jl`](threeBodyProb.jl) to make it loop through initial conditions and record time to collision, and an R script to visualize it [`heatmap/create_heatmap.R`](heatmap/create_heatmap.R). For the initial conditions, I just ran the original script to find an interesting starting point, then chose a range of starting x and y values for mass 1.
+
+# Original Readme below:
+
 # Random Three-Body Simulation Generator (***with Twitter bot***)
 
 <img align="left" src="figure8.gif" width="380" height="380">

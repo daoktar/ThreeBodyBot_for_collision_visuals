@@ -14,7 +14,7 @@
 # to add music, specify initial conditions, or otherwise tinker...read the code/README and the comments in the code!
 # this has only been tested on Linux (Mint) and Windows 10, so you might run into small additional issues on macOS?
 
-using Plots, Random, Printf, Plots.Measures, Dates
+using Plots, Random, Printf, Plots.Measures, Dates, CSV, DataFrames, DataFramesMeta
 
 function initCondGen() #get random initial conditions for mass/radius, position, and velocity
     function getMass(nBodies) #generate random masses that better reflect actual stellar populations, although not currently using because it's boring
@@ -104,7 +104,7 @@ function dR(r,m;energyBool=0) #function we will use RK4 on to approximate soluti
     return [v1X,v1Y,v2X,v2Y,v3X,v3Y,aX1,aY1,aX2,aY2,aX3,aY3]
 end
 
-function gen3Body(stopCond=[10,100],numSteps=10000) #default stop conditions of 10 yrs and 100 AU sep
+function gen3Body(stopCond=[10,100],numSteps=10000,initCond=nothing) #default stop conditions of 10 yrs and 100 AU sep
     tStop=stopCond[1]*365*24*3600 #convert to SI s
     sepStop=stopCond[2]*1.5e11 #convert to SI m
     stop=false
@@ -117,7 +117,23 @@ function gen3Body(stopCond=[10,100],numSteps=10000) #default stop conditions of 
     y2=zeros(length(t))
     x3=zeros(length(t))
     y3=zeros(length(t))
-    r,rad,m=initCondGen()
+    if(initCond !== nothing)
+        r,m,rad=initCond
+
+        # println("r: $r")
+        # println("n: $m")
+        # println("rad: $rad")
+
+        # open("initCond.txt","w") do f #save initial conditions to file in folder where script is run
+        #     write(f,"preset: m1=$(@sprintf("%.1f",(m[1]/2e30))) m2=$(@sprintf("%.1f",(m[2]/2e30))) m3=$(@sprintf("%.1f",(m[3]/2e30))) (solar masses)\nv1x=$(r[7]/1e3) v1y=$(r[8]/1e3) v2x=$(r[9]/1e3) v2y=$(r[10]/1e3) v3x=$(r[11]/1e3) v3y=$(r[12]/1e3) (km/s)\nx1=$(r[1]/1.5e11) y1=$(r[2]/1.5e11) x2=$(r[3]/1.5e11) y2=$(r[4]/1.5e11) x3=$(r[5]/1.5e11) y3=$(r[6]/1.5e11) (AU from center)")
+        # end
+    else
+        r,rad,m=initCondGen()
+
+        # println("r: $r")
+        # println("n: $m")
+        # println("rad: $rad")
+    end
     initV=copy(r[7:end])
     min12=rad[1]+rad[2]
     min13=rad[1]+rad[3]
@@ -180,7 +196,7 @@ function gen3Body(stopCond=[10,100],numSteps=10000) #default stop conditions of 
     return [x1,y1,x2,y2,x3,y3], t, m, rad, collisionBool, collisionInds, initV
 end
 
-function getInteresting3Body(minTime=0) #in years, defaults to 0
+function getInteresting3Body(minTime=0, initCond=nothing) #in years, defaults to 0
     #sometimes (most of the time) random conditions result in a really short animation where things
     #just crash into each other/fly away, so this function throws away those
     yearSec=365*24*3600
@@ -188,8 +204,12 @@ function getInteresting3Body(minTime=0) #in years, defaults to 0
     i=1
     while interesting==false
         global energy=[] #re-initialize empty energy array
-        plotData,t,m,rad,collisionBool,collisionInds,initV=gen3Body([60,200],600000)
-        if (maximum(t)/yearSec)>minTime #only return if simulation runs for longer than minTime
+        plotData,t,m,rad,collisionBool,collisionInds,initV=gen3Body([60,200],600000, initCond)
+        if initCond !== nothing  #if we are setting the valuas manually, don't log
+            println(maximum(t)/yearSec) #tell me how many years we are simulating
+            return plotData,t,m,rad,collisionBool,collisionInds
+            interesting=true
+        elseif (maximum(t)/yearSec)>minTime #only return if simulation runs for longer than minTime
             println(maximum(t)/yearSec) #tell me how many years we are simulating
             open("cron_log.txt","a") do f #for cron logging, a flag = append
                 write(f,"$(maximum(t)/yearSec)\n")
@@ -436,15 +456,7 @@ function makeCircleVals(r,center=[0,0]) #makes circle values for the stars to pl
     return xVals,yVals
 end
 
-function main() #pulls everything together, speeds things up to put everything in a function + gets rid of bad global syntax
-    println("sit tight -- finding an interesting solution")
-    plotData,t,m,rad,collisionBool,collisionInds=getInteresting3Body(15) #find an interesting solution at least 15 years
-    if collisionBool == true
-        println("collision! inds = $collisionInds")
-    else
-        println("no collision")
-    end
-
+function saveFrames(plotData,t,m,rad,collisionBool,collisionInds)
     c=[:DodgerBlue,:Gold,:Tomato] #most massive to least massive, also roughly corresponds to temp
     colors=getColors(m,c)
     #adding fake stars
@@ -673,6 +685,150 @@ function main() #pulls everything together, speeds things up to put everything i
             closeall() #close plots
         end
     end
+end
+
+
+function doOne()
+    println("sit tight -- finding an interesting solution")
+
+    
+    #v1x=-1.673 v1y=-4.038 v2x=-4.276 v2y=6.851 v3x=2.399 v3y=0.942 (km/s)
+    #x1=-7 y1=-11 x2=8 y2=-13 x3=19 y3=4 (AU from center)
+    r=[-7,-11,8,-13,19,4,-1.673 * 1e3,-4.038 * 1e3,-4.276 * 1e3,6.851 * 1e3,2.399 * 1e3, 0.942 * 1e3]
+    #m1=84.2 m2=26.9 m3=58.0 (solar masses)
+    m=[84.2, 26.9, 58.0] 
+    rad=m.^0.8 #3 radii based on masses in solar units
+    m=m.*2e30 #convert to SI kg
+    rad=rad.*7e8 #convert to SI m
+
+    initCond = [r,m,rad]
+    initCond = nothing
+    
+    plotData,t,m,rad,collisionBool,collisionInds=getInteresting3Body(15, initCond) #find an interesting solution at least 15 years
+    if collisionBool == true
+        println("collision! inds = $collisionInds")
+    else
+        println("no collision")
+    end
+
+    #saveFrames(plotData,t,m,rad,collisionBool,collisionInds)
+
+end
+
+function mapCollisions()
+    yearSec=365*24*3600
+
+    xres = 600
+    yres = 600
+    xmin = -60
+    xmax = 60
+    ymin = -60
+    ymax = 60
+
+    data = rand(xres,yres)
+
+    dfdata = DataFrame(xPos = Number[], yPos = Number[], timeToCrash = Number[])
+	
+    #Optional, preload dataframe from where we last left off
+    #old_dfdata = DataFrame(CSV.File("tmpPlots/tmpSeparatedData_300y.csv"))
+	old_dfdata = DataFrame(xPos = [], yPos= [])
+    
+
+
+    xvals = collect(1:xres) /  xres * (xmax - xmin) .+ xmin
+    yvals = collect(1:yres) / yres * (ymax - ymin) .+ ymin
+
+    for i = 1:xres
+        x = xvals[i]
+        for j = 1:yres
+            y = yvals[j]
+            #x1=-7 y1=-11 x2=8 y2=-13 x3=19 y3=4 (AU from center) #v1x=-1.673 v1y=-4.038 v2x=-4.276 v2y=6.851 v3x=2.399 v3y=0.942 (km/s)
+            r=[-7*1.5e11,-11*1.5e11,8*1.5e11,-13*1.5e11,19*1.5e11,4*1.5e11,
+                -1.673 * 1e3,-4.038 * 1e3,-4.276 * 1e3,6.851 * 1e3,2.399 * 1e3, 0.942 * 1e3]
+            #m1=84.2 m2=26.9 m3=58.0 (solar masses)
+            m=[84.2, 26.9, 58.0] 
+
+            rad=m.^0.8 #3 radii based on masses in solar units
+            m=m.*2e30 #convert to SI kg
+            rad=rad.*7e8 #convert to SI m
+
+            #r[1] = (i / xres * (xmax - xmin) + xmin) * 1.5e11
+            #r[2] = (j / yres * (ymax - ymin) + ymin) * 1.5e11
+
+            r[1] = x * 1.5e11
+            r[2] = y * 1.5e11
+
+            println("starting coordinates: $x, $y")
+            #println(r[1])
+            #println(r[2])
+
+            #Check if data for this point already exists (loading previous progress)
+            alreadyexisting = @subset(old_dfdata, :xPos .== x, :yPos .== y)
+            if nrow(alreadyexisting) > 0
+                println("already existing data loaded")
+                time = alreadyexisting[1, :timeToCrash]
+                if time == -30
+                    collisionBool = false
+                else
+                    collisionBool = true
+                end
+            else
+                initCond = [r,m,rad]
+                plotData,t,m,rad,collisionBool,collisionInds=getInteresting3Body(15, initCond) #find an interesting solution at least 15 years    
+                time = maximum(t)/yearSec
+            end
+
+
+            if collisionBool == true
+                println("***********************")
+                println("collision!")
+                println("***********************")    
+                push!(dfdata, (x, y, time))
+                data[i, j] = time
+            else
+                println("no collision, time $time")
+                push!(dfdata, (x, y, -30))
+                data[i, j] = -30
+            end
+
+
+        end
+        CSV.write("tmpPlots/tmpSeparatedData.csv", dfdata)
+    end
+
+    CSV.write("tmpPlots/separatedData.csv", dfdata)
+
+    df = DataFrame(data, :auto)
+    open("tmpPlots/row-col-vals.txt","w") do f #save initial conditions to file in folder where script is run
+        write(f,"rownames=$yvals \ncolvals=$xvals")
+    end
+    CSV.write("tmpPlots/heatmapdata.csv", df)
+
+    
+
+    gr()
+    p=heatmap(xvals,
+        yvals, data,
+        c=cgrad([:blue, :white,:red, :yellow]),
+        xlabel="x values", ylabel="y values",
+        title="My title")
+
+    png(p,@sprintf("tmpPlots/heatmap.png"))
+
+
+
+end
+
+
+function main() #pulls everything together, speeds things up to put everything in a function + gets rid of bad global syntax
+    #doOne()
+
+    mapCollisions()
+
+
+
+
+    
 end
 
 #this is a function that will generate the animation for you without having to use the command line, works on Linux and Windows (run as administrator), untested on macOS
