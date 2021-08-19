@@ -80,5 +80,5 @@ ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
              color = "black") +
   annotate("text", x=90, y=40 + 2, label= "m1", color="black")
 
-ggsave(path = "", filename = "rheatmap.png", width = 9, height = 8, device='png', dpi=350)
+ggsave(path = "", filename = "rheatmap.png", width = 9, height = 8, device='png', dpi=1200)
 
