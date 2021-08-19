@@ -718,12 +718,12 @@ end
 function mapCollisions()
     yearSec=365*24*3600
 
-    xres = 600
-    yres = 600
-    xmin = -60
-    xmax = 60
-    ymin = -60
-    ymax = 60
+    xres = 800
+    yres = 800
+    xmin = -80
+    xmax = 80
+    ymin = -80
+    ymax = 80
 
     data = rand(xres,yres)
 
