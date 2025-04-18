@@ -1,0 +1,13 @@
+install.packages("dplyr", dependencies = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+rlang::last_trace()
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+install.packages("languageserver")#
+install.packages("lintr")
+install.packages("languageserver")
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)
+source('~/CODE/ThreeBodyBot_for_collision_visuals/heatmap/create_heatmap.R', chdir = TRUE)

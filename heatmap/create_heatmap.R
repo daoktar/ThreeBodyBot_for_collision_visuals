@@ -3,20 +3,20 @@ library(dplyr)
 
 data1 <- read.csv("separatedData.csv")
 
-m1=84.2 
-m2=26.9 
+m1=84.2 # 84.2
+m2=26.9
 m3=58.0 # (solar masses)
-v1x=-1.673 
+v1x=-1.673
 v1y=-4.038
 v2x=-4.276
 v2y=6.851
 v3x=2.399
 v3y=0.942 #(km/s)
-#x1=[-60 to 60] y1=[-60 to 60] 
-x2=8 
-y2=-13 
-x3=19 
-y3=4 #(AU from center)
+#x1=[-60 to 60] y1=[-60 to 60]
+x2=8
+y2=-13
+x3=19
+y3=4 #(AU from center) 4
 
 data1_fixed <- data1 %>%
   mutate(
@@ -25,12 +25,12 @@ data1_fixed <- data1 %>%
 
 #data1_fixed <- data1_fixed %>% sample_n(10000)
 
-ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) + 
-  geom_tile() + 
+ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
+  geom_tile() +
   labs(x="m1 Starting x Position",
        y ="m1 Starting y Position", fill = "Time to Collision") +
-  coord_cartesian(xlim = c(-60, 60), clip="off") +
-  scale_fill_gradientn(colors = c("black", 
+  coord_cartesian(xlim = c(-200, 200), clip="off") +
+  scale_fill_gradientn(colors = c("black",
                                   "#2b5884", #Note, I wanted the black and white sections to be small at the ends, so I had to add a bunch of middle points to make that work
                                   "#305d8a",
                                   "#366390",
@@ -67,7 +67,7 @@ ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
   annotate("text", x=x2, y=y2 - 3, label= "m2", color="white") +
   geom_segment(aes(x = x3, y = y3, xend = x3 + v3x, yend = y3 + v3y),
                color = "white",
-               arrow = arrow(length = unit(0.2, "cm"))) + 
+               arrow = arrow(length = unit(0.2, "cm"))) +
   geom_point(aes(x = x3, y = y3),
              size=1,
              color = "white") +
@@ -80,5 +80,4 @@ ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
              color = "black") +
   annotate("text", x=90, y=40 + 2, label= "m1", color="black")
 
-ggsave(path = "", filename = "rheatmap.png", width = 9, height = 8, device='png', dpi=1200)
-
+ggsave(path = "/Users/daoktar/CODE/ThreeBodyBot_for_collision_visuals/heatmap", filename = "rheatmap2.png", width = 14, height = 14, device='png', dpi=1200)
