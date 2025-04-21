@@ -29,7 +29,9 @@ ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
   geom_tile() +
   labs(x="m1 Starting x Position",
        y ="m1 Starting y Position", fill = "Time to Collision") +
-  coord_cartesian(xlim = c(-200, 200), clip="off") +
+  # change plot scale here.
+  # Changing only x-axis, y-axis is autoscaled based on data
+  coord_cartesian(xlim = c(-150, 150), clip="on") +
   scale_fill_gradientn(colors = c("black",
                                   "#2b5884", #Note, I wanted the black and white sections to be small at the ends, so I had to add a bunch of middle points to make that work
                                   "#305d8a",
@@ -80,4 +82,4 @@ ggplot(data1_fixed, aes(xPos, yPos, fill= timeToCrash)) +
              color = "black") +
   annotate("text", x=90, y=40 + 2, label= "m1", color="black")
 
-ggsave(path = "/Users/daoktar/CODE/ThreeBodyBot_for_collision_visuals/heatmap", filename = "rheatmap2.png", width = 14, height = 14, device='png', dpi=1200)
+ggsave(path = "/Users/daoktar/CODE/ThreeBodyBot_for_collision_visuals/heatmap", filename = "rheatmap3.png", width = 14, height = 14, device='png', dpi=1200)

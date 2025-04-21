@@ -772,17 +772,16 @@ function doOne()
     #saveFrames(plotData,t,m,rad,collisionBool,collisionInds)
 
 end
-
+# ------------ CHANGE CALCULATION SCALE ------------------------------------------------------
 function mapCollisions()
     yearSec = 365 * 24 * 3600
-    # !!!! Here we can change maybe scale &!&!&&!&!&!&!&!&&!
     xres = 2000
     yres = 2000
     xmin = -200
     xmax = 200
     ymin = -200
     ymax = 200
-
+    # ------------ CHANGE CALCULATION SCALE ------------------------------------------------------
     data = rand(xres, yres)
 
     dfdata = DataFrame(xPos=Number[], yPos=Number[], timeToCrash=Number[])
